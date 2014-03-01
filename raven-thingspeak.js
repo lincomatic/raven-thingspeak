@@ -2,6 +2,13 @@
  * Reads energy data from a smart meter via a RAVEn RFA-Z106 dongle (http://www.rainforestautomation.com/raven) and uploads to ThingSpeak.
  hacked from stormboy's node-raven https://github.com/stormboy/node-raven
  by Sam C. Lin
+
+ ThingSpeak channel fields:
+ field1: instantaneous usage
+ field2: cumulative net usage
+ field3: cumulative energy in
+ field4: cumulative energy out
+ field5: daily net energy
  */
 
 var serialport = require("serialport"),
@@ -111,6 +118,7 @@ function openHandler (self) {
     
     // add serial port data handler	
     self.serialPort.on('data', function(data) {
+	try {
 	buffer += data.toString() + "\r\n";		// append to the read buffer
 	if ( data.toString().indexOf('</') == 0 ) {		// check if last part of XML element.
 	    
@@ -175,6 +183,8 @@ function openHandler (self) {
 	    });
 	    buffer = "";	// reset the read buffer
 	}
+	}
+	catch(err) { console.log(err); }
     });
 }
 
